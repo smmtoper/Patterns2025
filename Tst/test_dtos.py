@@ -1,6 +1,8 @@
 import unittest
 from Src.Dtos.nomenclature_dto import nomenclature_dto
 from Src.Dtos.range_dto import range_dto
+from Src.start_service import start_service
+from Src.reposity import reposity
 
 # Набор тестов для работы с Dto
 class test_dtos(unittest.TestCase):
@@ -34,6 +36,49 @@ class test_dtos(unittest.TestCase):
         # Проверка
         assert result is not None
         assert len(dto.name) > 0    
+
+    # Проверить фабричный метод перевода в dto
+    def test_notThrow_nomenclature_model_to_dto(self):
+        # Подготовка
+        start = start_service()
+        start.start()    
+        item = start.data[  reposity.nomenclature_key() ][0]
+
+        # Действие
+        result = item.to_dto()
+
+        # Проверка
+        assert result is not None
+
+    # Проверить фабричный метод перевода в dto
+    def test_notThrow_range_model_to_dto(self):
+        # Подготовка
+        start = start_service()
+        start.start()    
+        item = start.data[  reposity.range_key() ][0]
+
+        # Действие
+        result = item.to_dto()
+
+        # Проверка
+        assert result is not None    
+
+    # Проверить фабричный метод перевода в dto
+    def test_notThrow_group_model_to_dto(self):
+        # Подготовка
+        start = start_service()
+        start.start()    
+        item = start.data[  reposity.group_key() ][0]
+
+        # Действие
+        result = item.to_dto()
+
+        # Проверка
+        assert result is not None        
+
+          
+
+        
 
 
   

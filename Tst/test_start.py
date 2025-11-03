@@ -14,7 +14,12 @@ class test_start(unittest.TestCase):
         start.start()
 
         # Проверка
+        print(start.error_message)
         assert len(start.data[ reposity.range_key()]) > 0
+        assert len(start.data[ reposity.group_key()]) > 0
+        assert len(start.data[ reposity.nomenclature_key()]) > 0
+        assert len(start.data[ reposity.receipt_key()]) > 0
+        assert len(start.data[ reposity.storage_key()]) > 0
 
     # Проверить уникальность элемиентов
     def test_checkUnique_start_service_load(self):
@@ -47,7 +52,6 @@ class test_start(unittest.TestCase):
 
         # Действие
         repo.initalize() 
-
 
 
           

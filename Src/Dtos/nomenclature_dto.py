@@ -1,4 +1,4 @@
-from Src.Core.abstract_dto import abstact_dto
+from Src.Core.abstract_dto import abstract_dto
 
 # Модель номенклатуры (dto)
 # Пример
@@ -7,7 +7,7 @@ from Src.Core.abstract_dto import abstact_dto
 #                "category_id":"7f4ecdab-0f01-4216-8b72-4c91d22b8918",
 #                "id":"0c101a7e-5934-4155-83a6-d2c388fcc11a"
 
-class nomenclature_dto(abstact_dto):
+class nomenclature_dto(abstract_dto):
     __range_id:str = ""
     __category_id:str = ""
 

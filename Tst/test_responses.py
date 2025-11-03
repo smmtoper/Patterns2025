@@ -1,6 +1,7 @@
 from Src.start_service import start_service
 from Src.Logics.markdown_response import markdown_response
 from Src.reposity import reposity
+from Src.Logics.response_markdown import response_markdown
 import unittest
 
 # Набор тестов для проверки формирования данных
@@ -8,15 +9,16 @@ import unittest
 class test_responses(unittest.TestCase):
 
     # Проверить формирование Markdown 
-    def test_markdown_response_build(self):
+    def test_response_markdown_build(self):
         # Подготовка
         service = start_service()
         service.start()
-        response = markdown_response()
+        response = response_markdown()
+        data = service.data[ reposity.nomenclature_key() ]
 
 
         # Действие
-        result = response.build(service.data[ reposity.nomenclature_key() ] )
+        result = response.build( data )
 
         # Проверка
         assert len(result) > 0
