@@ -1,0 +1,87 @@
+import unittest
+from Src.start_service import start_service
+from Src.reposity import reposity
+from Src.Logics.convert_factory import convert_factory
+from Src.Core.common import common
+from Src.Dtos.range_dto import range_dto
+
+# Тесты для проверки конвертации данных (сериализация / десериализация) 
+class test_convert(unittest.TestCase):
+
+    # Проверить сериализация одного элемента
+    def test_convert_factory_serialize_range(self):
+        # Подготовка
+        service = start_service()
+        service.start()
+        items = reposity().data[  reposity.range_key() ]
+        data = common.models_to_dto( items )
+        item = data[0]
+        factory = convert_factory()
+
+        # Действие
+        result = factory.serialize(item)
+
+        # Проверки
+        assert result is not None
+        assert len(result) > 0
+        print(result)
+
+
+    # Проверить сериализация списка единиц измерения
+    def test_convert_factory_serialize_ranges(self):
+        # Подготовка
+        service = start_service()
+        service.start()
+        items = reposity().data[  reposity.range_key() ]
+        data = common.models_to_dto( items )
+
+        factory = convert_factory()
+
+        # Действие
+        result = factory.serialize(data)
+
+        # Проверки
+        assert result is not None
+        assert len(result) > 0
+        print(result)    
+
+    # Проверить сериализация списка номенклатуры
+    def test_convert_factory_serialize_nomenclatures(self):
+        # Подготовка
+        service = start_service()
+        service.start()
+        items = reposity().data[  reposity.nomenclature_key() ]
+        data = common.models_to_dto( items )
+
+        factory = convert_factory()
+
+        # Действие
+        result = factory.serialize(data)
+
+        # Проверки
+        assert result is not None
+        assert len(result) > 0
+        print(result)    
+
+    # Проверить десериализацию одного элемента
+    def test_deserialize_range(self):
+        # Подготовка
+        service = start_service()
+        service.start()
+        data =  {
+                "name":"Грамм",
+                "id":"adb7510f-687d-428f-a697-26e53d3f65b7",
+                "base_id":None,
+                "value":1
+            }
+
+        # Действие
+        result = range_dto().create( data ) 
+
+        # Проверки
+        assert result is not None
+        assert result.id == "adb7510f-687d-428f-a697-26e53d3f65b7"
+
+
+    
+
