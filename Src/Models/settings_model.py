@@ -1,12 +1,24 @@
 from Src.Models.company_model import company_model
 from Src.Core.validator import validator, argument_exception
 from Src.Core.response_formats import response_formats
+from datetime import datetime
 
 ######################################
 # Модель настроек приложения
 class settings_model:
     __company: company_model = None
     __default_response_format:str =  response_formats.csv()
+    __block_period:datetime
+
+    # Дата блокировки
+    @property
+    def block_period(self) -> datetime:
+        return self.__block_period
+
+    @block_period.setter    
+    def block_period(self, value:datetime):
+        validator.validate(value, datetime)
+        self.__block_period = value
 
     # Текущая организация
     @property

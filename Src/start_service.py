@@ -3,7 +3,6 @@ from Src.Models.range_model import range_model
 from Src.Models.group_model import group_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Core.validator import validator, argument_exception, operation_exception
-import os
 import json
 from Src.Models.receipt_model import receipt_model
 from Src.Models.receipt_item_model import receipt_item_model
@@ -14,8 +13,9 @@ from Src.Dtos.storage_dto import storage_dto
 from Src.Models.storage_model import storage_model
 from Src.Models.transaction_model import transaction_model
 from Src.Dtos.transaction_dto import transaction_dto
+from Src.Core.abstract_manager import abstract_manager
 
-class start_service:
+class start_service(abstract_manager):
     # Репозиторий
     __repo: reposity = reposity()
 
@@ -25,9 +25,6 @@ class start_service:
     # Словарь который содержит загруженные и инициализованные инстансы нужных объектов
     # Ключ - id записи, значение - abstract_model
     __cache = {}
-
-    # Наименование файла (полный путь)
-    __full_file_name:str = ""
 
     # Описание ошибки
     __error_message:str = ""
@@ -41,20 +38,6 @@ class start_service:
             cls.instance = super(start_service, cls).__new__(cls)
         return cls.instance 
 
-    # Текущий файл
-    @property
-    def file_name(self) -> str:
-        return self.__full_file_name
-
-    # Полный путь к файлу настроек
-    @file_name.setter
-    def file_name(self, value:str):
-        validator.validate(value, str)
-        full_file_name = os.path.abspath(value)        
-        if os.path.exists(full_file_name):
-            self.__full_file_name = full_file_name.strip()
-        else:
-            raise argument_exception(f'Не найден файл настроек {full_file_name}')
 
     # Информация об ошибке    
     @property
@@ -62,18 +45,19 @@ class start_service:
         return self.__error_message    
 
 
-    # Загрузить настройки из Json файла
+    # Загрузить стартовые данные из файла
     def load(self) -> bool:
-        if self.__full_file_name == "":
+        if self.file_name == "":
             raise operation_exception("Не найден файл настроек!")
 
         try:
-            with open( self.__full_file_name, 'r') as file_instance:
+            with open( self.file_name, 'r') as file_instance:
                 settings = json.load(file_instance)
                 return self.convert(settings)
         except Exception as e:
             self.__error_message = str(e)
             return False
+        
         
     # Сохранить элемент в репозитории
     def __save_item(self, key:str, dto, item):
@@ -237,7 +221,7 @@ class start_service:
     Основной метод для генерации эталонных данных
     """
     def start(self):
-        self.file_name = "settings.json"
+        self.file_name = "dump.json"
         result = self.load()
         if result == False:
             raise operation_exception(f"Невозможно сформировать стартовый набор данных!\nОписание: {self.error_message}") 

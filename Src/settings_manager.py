@@ -5,15 +5,14 @@ from Src.Core.validator import validator
 from Src.Models.company_model import company_model
 from Src.Core.common import common
 from Src.Core.response_formats import response_formats
-import os
 import json
+from datetime import datetime
+from Src.Core.abstract_manager import abstract_manager
 
 ####################################################3
 # Менеджер настроек. 
 # Предназначен для управления настройками и хранения параметров приложения
-class settings_manager:
-    # Наименование файла (полный путь)
-    __full_file_name:str = ""
+class settings_manager(abstract_manager):
 
     # Настройки
     __settings:settings_model = None
@@ -25,53 +24,46 @@ class settings_manager:
         return cls.instance 
     
     def __init__(self):
-        self.set_default()
+        self.__set_default()
 
     # Текущие настройки
     @property
     def settings(self) -> settings_model:
         return self.__settings
 
-    # Текущий файл
-    @property
-    def file_name(self) -> str:
-        return self.__full_file_name
-
-    # Полный путь к файлу настроек
-    @file_name.setter
-    def file_name(self, value:str):
-        validator.validate(value, str)
-        full_file_name = os.path.abspath(value)        
-        if os.path.exists(full_file_name):
-            self.__full_file_name = full_file_name.strip()
-        else:
-            raise argument_exception(f'Не найден файл настроек {full_file_name}')
-
     # Загрузить настройки из Json файла
     def load(self) -> bool:
-        if self.__full_file_name == "":
+        if self.file_name == "":
             raise operation_exception("Не найден файл настроек!")
 
         try:
-            with open( self.__full_file_name, 'r') as file_instance:
+            with open( self.file_name, 'r') as file_instance:
                 settings = json.load(file_instance)
 
+                # Реквизиты оргаизации
                 if "company" in settings.keys():
                     data = settings["company"]
-                    result = self.convert(data)
+                    result = self.__convert(data)
                 
+                # Формат по умолчанию
                 if "default_format" in settings.keys() and result == True:
                     data = settings["default_format"]
                     if data in response_formats.list_all_formats():
                         self.settings.default_response_format = data
 
+                # Дата блокировки
+                if "block_period" in settings.keys() and result == True:
+                    data = settings["block_period"]
+                    date_format = "%Y-%m-%d"
+                    date = datetime.strptime(data, date_format)
+                    self.__settings.block_period = date
                 return result
             return False
         except:
             return False
         
     # Обработать полученный словарь    
-    def convert(self, data: dict) -> bool:
+    def __convert(self, data: dict) -> bool:
         validator.validate(data, dict)
 
         fields = common.get_fields(self.__settings.company)
@@ -85,9 +77,8 @@ class settings_manager:
 
         return True
 
-
     # Параметры настроек по умолчанию
-    def set_default(self):
+    def __set_default(self):
         company = company_model()
         company.name = "Рога и копыта"
         company.inn = -1

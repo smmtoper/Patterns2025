@@ -8,7 +8,7 @@ class prototype_report(prototype):
 
 
     # Сделать фильтр по номенклатуре
-    # Врзврат - прототип
+    # Возврат - прототип
     @staticmethod
     def filter_by_nomenclature(source:prototype, nomenclature:nomenclature_model  ) -> prototype:
         validator.validate(source, prototype)

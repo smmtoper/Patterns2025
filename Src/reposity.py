@@ -55,6 +55,12 @@ class reposity:
         return "receipt_model"
     
     """
+    Ключ для остатков
+    """
+    def rest_key():
+        return "rest_key"
+    
+    """
     Получить список всех ключей
     Источник: https://github.com/Alyona1619
     """
