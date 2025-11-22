@@ -14,6 +14,7 @@ from Src.Models.storage_model import storage_model
 from Src.Models.transaction_model import transaction_model
 from Src.Dtos.transaction_dto import transaction_dto
 from Src.Core.abstract_manager import abstract_manager
+from Src.Logics.convert_factory import convert_factory
 
 class start_service(abstract_manager):
     # Репозиторий
@@ -221,7 +222,7 @@ class start_service(abstract_manager):
     Основной метод для генерации эталонных данных
     """
     def start(self):
-        self.file_name = "dump.json"
+        self.file_name = "default.json"
         result = self.load()
         if result == False:
             raise operation_exception(f"Невозможно сформировать стартовый набор данных!\nОписание: {self.error_message}") 

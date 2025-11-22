@@ -98,6 +98,9 @@ class convert_factory(abstract_logic):
         # Связка для всех моделей
         for  inheritor in abstract_dto.__subclasses__():
             self._maps[inheritor] = reference_convertor    
+
+        # Ввиду наследования
+        self._maps[  transaction_dto  ] =    reference_convertor 
     
 
     """
@@ -180,23 +183,4 @@ class convert_factory(abstract_logic):
                 
             return result    
         
-        
-    """
-    Десериализовать один элемент
-    """    
-    def deserialize(self,  data:dict, instance ):
-        validator.validate(data, dict)
-        if instance is None:
-            self.set_exception( argument_exception("Тип данных для десериализации не указан!"))
-            return
-        
-        if type(instance) not in self._maps.keys():
-            self.set_exception( operation_exception(f"Невозможно подобрать конвертор для типа {type(instance)}"))
-
-        if not isinstance(instance, abstract_dto):
-            self.set_exception( argument_exception(f"Невозможно выполнить конвертор. Инстанс объекта указан не верно! {type(instance)}"))
-      
-        # Загрузим списочные поля вызывая метод dto
-        # см abstract_dto общий метод create
-        instance.create(data)
 

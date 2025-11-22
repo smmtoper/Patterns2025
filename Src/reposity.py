@@ -1,9 +1,13 @@
+from Src.Core.abstract_manager import abstract_manager
+from Src.Logics.convert_factory import convert_factory
+from Src.Core.validator import operation_exception
 from Src.Core.common import common
+import json
 
 """
 Репозиторий данных
 """
-class reposity:
+class reposity(abstract_manager):
     __data = {}
 
     @property
@@ -83,5 +87,36 @@ class reposity:
         keys = reposity.keys()
         for key in keys:
             self.__data[ key ] = []
-    
-    
+
+
+    """
+    Загрузить данные
+    """
+    def load(self) -> bool:
+        pass
+
+    """
+    Сохранить данные
+    """
+    def save(self) -> bool:
+        if self.file_name == "":
+            raise operation_exception("Не найден файл настроек!")
+
+        result = {}
+        factory = convert_factory() 
+        
+        # Формируем общий словарь
+        for key in reposity.keys():
+            models = self.data[ key  ]
+            dtos = common.models_to_dto( models)
+            data = factory.serialize( dtos )
+            result[ key ] = data
+
+        # Сохраняю полученные данные
+        text = json.dumps(result, ensure_ascii=False, indent=4)
+        try:
+            with open( self.file_name, 'w', encoding='utf-8') as file_instance:
+                file_instance.write(text)
+            return True
+        except:
+            return False    

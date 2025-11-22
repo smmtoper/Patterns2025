@@ -43,9 +43,10 @@ class transaction_model(rest_model):
     """
     def to_dto(self) -> transaction_dto:
         dto = transaction_dto()
-        dto.period = self.period
+        dto.period = self.period.strftime("%Y-%m-%d")
         dto.storage_id = self.storage.unique_code
         dto.nomenclature_id = self.nomenclature.unique_code
         dto.range_id = self.range.unique_code
         dto.id = self.unique_code
+        dto.value = self.value
         return dto    

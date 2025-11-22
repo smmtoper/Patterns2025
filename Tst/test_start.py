@@ -54,6 +54,21 @@ class test_start(unittest.TestCase):
         # Действие
         repo.initalize() 
 
+    # Проверить сохранение данных
+    def test_true_start_service_save(self):
+        # Подготовка
+        start = start_service()
+        start.start()
+        repo = reposity()
+        repo.file_name = "dump.json"
+
+        # Действие
+        result = repo.save()
+
+        # Проверки
+        assert result == True
+
+
 
           
 if __name__ == '__main__':

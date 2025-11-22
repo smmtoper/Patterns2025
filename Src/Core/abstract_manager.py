@@ -30,4 +30,4 @@ class abstract_manager(abc.ABC):
         if os.path.exists(full_file_name):
             self.__full_file_name = full_file_name.strip()
         else:
-            raise argument_exception(f'Не найден файл настроек {full_file_name}')
+            raise argument_exception(f'Не найден указанный файл {full_file_name}')
