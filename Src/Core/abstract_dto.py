@@ -26,7 +26,7 @@ class abstract_dto:
     def id(self, value):
         self.__id = value   
 
-    # Универсальный фабричный метод для загрузщки dto из словаря
+    # Универсальный фабричный метод для создания dto из словаря
     @abc.abstractmethod
     def create(self, data) -> "abstract_dto":
         validator.validate(data, dict)

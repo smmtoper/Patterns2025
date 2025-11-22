@@ -14,8 +14,7 @@ class common:
         for  inheritor in entity_model.__subclasses__():
             result.append(inheritor.__name__)
 
-        return result    
-
+        return result  
 
     """
     Получить полный список полей любой модели

@@ -60,7 +60,7 @@ class start_service(abstract_manager):
         
         
     # Сохранить элемент в репозитории
-    def __save_item(self, key:str, dto, item):
+    def __save_item_to_reposity(self, key:str, dto, item):
         validator.validate(key, str)
         item.unique_code = dto.id
         self.__cache.setdefault(dto.id, item)
@@ -76,7 +76,7 @@ class start_service(abstract_manager):
         for range in ranges:
             dto = range_dto().create(range)
             item = range_model.from_dto(dto, self.__cache)
-            self.__save_item( reposity.range_key(), dto, item )
+            self.__save_item_to_reposity( reposity.range_key(), dto, item )
 
         return True
 
@@ -90,7 +90,7 @@ class start_service(abstract_manager):
         for category in  categories:
             dto = category_dto().create(category)    
             item = group_model.from_dto(dto, self.__cache )
-            self.__save_item( reposity.group_key(), dto, item )
+            self.__save_item_to_reposity( reposity.group_key(), dto, item )
 
         return True
     
@@ -104,7 +104,7 @@ class start_service(abstract_manager):
         for storage in storages:
             dto = storage_dto().create(storage)
             item = storage_model.from_dto(dto, self.__cache )
-            self.__save_item( reposity.storage_key(), dto, item )
+            self.__save_item_to_reposity( reposity.storage_key(), dto, item )
 
         return True    
 
@@ -117,7 +117,7 @@ class start_service(abstract_manager):
         for transaction in data:
             dto = transaction_dto().create(transaction)
             item = transaction_model.from_dto(dto, self.__cache )
-            self.__save_item( reposity.transaction_key(), dto, item )
+            self.__save_item_to_reposity( reposity.transaction_key(), dto, item )
 
         return True    
 
@@ -131,7 +131,7 @@ class start_service(abstract_manager):
         for nomenclature in nomenclatures:
             dto = nomenclature_dto().create(nomenclature)
             item = nomenclature_model.from_dto(dto, self.__cache)
-            self.__save_item( reposity.nomenclature_key(), dto, item )
+            self.__save_item_to_reposity( reposity.nomenclature_key(), dto, item )
 
         return True        
 

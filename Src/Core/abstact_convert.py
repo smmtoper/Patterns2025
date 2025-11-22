@@ -14,16 +14,5 @@ class abstract_convert(abstract_logic):
     def serialize(self, field: str, object) -> dict:
         validator.validate(field, str)
 
-    """
-    Сконвертировать словарь в объект
-    """
-    @abc.abstractmethod
-    def deserialize(self, data , field: str, instance):
-        validator.validate(field, str)
-        if data is None:
-            return None
-        elif instance is None:
-            raise argument_exception("Не указан тип данных для конвертации!")
-
     
        
