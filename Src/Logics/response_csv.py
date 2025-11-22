@@ -5,7 +5,7 @@ from Src.Core.common import common
 """
 Класс для формирования данных в формате Csv
 """
-class response_scv(abstract_response):
+class response_csv(abstract_response):
 
     # Сформировать
     def build(self, data: list) -> str:

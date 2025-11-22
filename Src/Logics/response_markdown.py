@@ -9,7 +9,7 @@ class response_markdown(abstract_response):
 
     # Сформировать 
     def build(self, data: list) -> str:
-        text = super().build( data)
+        text = super().build( data )
 
         # Получаем первое значение для составления заголовков
         first_item = data[0]

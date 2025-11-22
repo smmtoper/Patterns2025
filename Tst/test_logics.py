@@ -1,5 +1,5 @@
 import unittest
-from Src.Logics.response_csv import response_scv
+from Src.Logics.response_csv import response_csv
 from Src.Models.group_model import group_model
 from Src.Logics.factory_entities import factory_entities
 from Src.Core.response_formats import response_formats
@@ -11,7 +11,7 @@ class test_logics(unittest.TestCase):
     # Проверим формирование CSV
     def test_notNone_response_csv_buld(self):
         # Подготовка
-        response = response_scv()
+        response = response_csv()
         data = []
         entity = group_model.create( "test" )
         data.append( entity )

@@ -42,3 +42,15 @@ class common:
 
         return result
    
+
+    """
+    Сконвертировать список моделей в dto
+    """
+    @staticmethod
+    def models_to_dto(items:list) -> list:
+        result = []
+        for item in items:
+            if isinstance(item, abstact_model):
+                result.append(  item.to_dto() )
+
+        return result        
