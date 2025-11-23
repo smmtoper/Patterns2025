@@ -53,8 +53,16 @@ class receipt_dto(abstract_dto):
     def steps(self) -> list:
         return self.__steps
     
+    @steps.setter
+    def steps(self, value):
+        self.__steps = value
+    
     # Состав
     @property
     def composition(self) -> list:
         return self.__composition
+    
+    @composition.setter
+    def composition(self, value):
+        self.__composition = value
 

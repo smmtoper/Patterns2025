@@ -14,14 +14,11 @@ from Src.Models.storage_model import storage_model
 from Src.Models.transaction_model import transaction_model
 from Src.Dtos.transaction_dto import transaction_dto
 from Src.Core.abstract_manager import abstract_manager
-from Src.Logics.convert_factory import convert_factory
+from Src.Dtos.receipt_dto import receipt_dto
 
 class start_manager(abstract_manager):
     # Репозиторий
     __repo: reposity_manager = reposity_manager()
-
-    # Рецепт по умолчанию
-    __default_receipt: receipt_model
 
     # Словарь который содержит загруженные и инициализованные инстансы нужных объектов
     # Ключ - id записи, значение - abstract_model
@@ -150,41 +147,18 @@ class start_manager(abstract_manager):
             self.__error_message = str(e)
             return False
 
-    # Обработать рецепт по умолчанию    
-    def __convert_receipt(self, data:dict) -> bool:
-        validator.validate(data, dict)
-        
-        try:
-            # 1 Созданим рецепт
-            cooking_time = data['cooking_time'] if 'cooking_time' in data else ""
-            portions = int(data['portions']) if 'portions' in data else 0
-            name =  data['name'] if 'name' in data else "НЕ ИЗВЕСТНО"
-            self.__default_receipt = receipt_model.create(name, cooking_time, portions  )
+    # Загрузить рецепты
+    def __convert_receipts(self, data:list) -> bool:
+        validator.validate(data, list)
 
-            # Загрузим шаги приготовления
-            steps =  data['steps'] if 'steps' in data else []
-            for step in steps:
-                if step.strip() != "":
-                    self.__default_receipt.steps.append( step )
-
-            # Собираем рецепт
-            compositions =  data['composition'] if 'composition' in data else []      
-            for composition in compositions:
-                # TODO: Заменить код через Dto
-                namnomenclature_id = composition['nomenclature_id'] if 'nomenclature_id' in composition else ""
-                range_id = composition['range_id'] if 'range_id' in composition else ""
-                value  = composition['value'] if 'value' in composition else ""
-                nomenclature = self.__cache[namnomenclature_id] if namnomenclature_id in self.__cache else None
-                range = self.__cache[range_id] if range_id in self.__cache else None
-                item = receipt_item_model.create(  nomenclature, range, value)
-                self.__default_receipt.composition.append(item)
-                
-            # Сохраняем рецепт
-            self.__repo.data[ reposity_manager.receipt_key() ].append(self.__default_receipt)
-            return True
-        except Exception as e:
-            self.__error_message = str(e)
+        if len(data) == 0:
             return False
+         
+        for receipt in data:
+            dto = receipt_dto().create(receipt)
+            item = receipt_model.from_dto(dto, self.__cache)
+            self.__save_item_to_reposity( reposity_manager.receipt_key(), dto, item )
+            return True
             
 
     # Обработать полученный словарь    
@@ -199,17 +173,17 @@ class start_manager(abstract_manager):
                 default_refenences = data["default_refenences"]
                 loaded_references = self.__convert_references(default_refenences)
 
-        # Обработать рецепт
-        if "default_receipt" in data.keys():
-                default_receipt = data["default_receipt"]
-                loaded_receipt = self.__convert_receipt(default_receipt)  
+        # Обработать рецепты
+        if "default_receipts" in data.keys():
+                default_receipts = data["default_receipts"]
+                loaded_receipts = self.__convert_receipts(default_receipts)  
 
         # Загрузить транзакции
         if "default_transactions" in data.keys():
                 default_transactions = data["default_transactions"]
                 loaded_transactions = self.__convert_transactions(default_transactions)             
 
-        return loaded_references and loaded_receipt and loaded_transactions
+        return loaded_references and loaded_receipts and loaded_transactions
 
     """
     Стартовый набор данных

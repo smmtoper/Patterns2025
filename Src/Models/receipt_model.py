@@ -1,5 +1,6 @@
 from Src.Core.entity_model import entity_model
 from Src.Core.validator import validator
+from Src.Dtos.receipt_dto import receipt_dto
 
 # Модель рецепта
 class receipt_model(entity_model):
@@ -31,6 +32,11 @@ class receipt_model(entity_model):
     def steps(self) -> list:
         return self.__steps
     
+    @steps.setter
+    def steps(self, value:list):
+        validator.validate(value, list)
+        self.__steps = value
+    
     # Состав
     @property
     def composition(self) -> list:
@@ -56,3 +62,19 @@ class receipt_model(entity_model):
         item.cooking_time = cooking_time
         item.portions = portions
         return item    
+    
+    """
+    Фабричный метод из Dto
+    """
+    @staticmethod
+    def from_dto(dto:receipt_dto, cache:dict):
+        validator.validate(dto, receipt_dto)
+        validator.validate(cache, dict)
+
+        item = receipt_model()
+        item.cooking_time = dto.cooking_time
+        item.portions = dto.portions
+        item.steps = dto.steps
+
+        
+        return item
