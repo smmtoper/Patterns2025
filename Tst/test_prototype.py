@@ -1,8 +1,8 @@
 import unittest
 from Src.Core.prototype import prototype
 from Src.Logics.prototype_report import prototype_report
-from Src.start_service import start_service
-from Src.reposity import reposity
+from Src.start_manager import start_manager
+from Src.reposity_manager import reposity_manager
 from Src.Core.validator import operation_exception
 from Src.Dtos.filter_dto import filter_dto
 
@@ -10,10 +10,10 @@ class test_prototype(unittest.TestCase):
 
     def test_any_prototype_filter(self):
         # Подготовка
-        start = start_service()
+        start = start_manager()
         start.start()
-        start_prototype = prototype_report(  start.data [ reposity.transaction_key() ] )
-        nomenclatures = start.data [ reposity.nomenclature_key() ]
+        start_prototype = prototype_report(  start.data [ reposity_manager.transaction_key() ] )
+        nomenclatures = start.data [ reposity_manager.nomenclature_key() ]
         if len(nomenclatures) == 0:
             raise operation_exception("List is empty!")
         first_nomenclature = nomenclatures[0]
@@ -28,9 +28,9 @@ class test_prototype(unittest.TestCase):
 
     def test_any_prototype_universal_filter(self):
         # Подготовка
-        start = start_service()
+        start = start_manager()
         start.start()
-        start_prototype = prototype_report(  start.data [ reposity.nomenclature_key() ] )
+        start_prototype = prototype_report(  start.data [ reposity_manager.nomenclature_key() ] )
         nomenclatures =  start_prototype.data
         if len(nomenclatures) == 0:
             raise operation_exception("List is empty!")

@@ -1,6 +1,6 @@
 import unittest
-from Src.start_service import start_service
-from Src.reposity import reposity
+from Src.start_manager import start_manager
+from Src.reposity_manager import reposity_manager
 from Src.Logics.convert_factory import convert_factory
 from Src.Core.common import common
 from Src.Dtos.range_dto import range_dto
@@ -11,9 +11,9 @@ class test_convert(unittest.TestCase):
     # Проверить сериализация одного элемента
     def test_convert_factory_serialize_range(self):
         # Подготовка
-        service = start_service()
+        service = start_manager()
         service.start()
-        items = reposity().data[  reposity.range_key() ]
+        items = reposity_manager().data[  reposity_manager.range_key() ]
         data = common.models_to_dto( items )
         item = data[0]
         factory = convert_factory()
@@ -30,9 +30,9 @@ class test_convert(unittest.TestCase):
     # Проверить сериализация списка единиц измерения
     def test_convert_factory_serialize_ranges(self):
         # Подготовка
-        service = start_service()
+        service = start_manager()
         service.start()
-        items = reposity().data[  reposity.range_key() ]
+        items = reposity_manager().data[  reposity_manager.range_key() ]
         data = common.models_to_dto( items )
 
         factory = convert_factory()
@@ -48,9 +48,9 @@ class test_convert(unittest.TestCase):
     # Проверить сериализация списка номенклатуры
     def test_convert_factory_serialize_nomenclatures(self):
         # Подготовка
-        service = start_service()
+        service = start_manager()
         service.start()
-        items = reposity().data[  reposity.nomenclature_key() ]
+        items = reposity_manager().data[  reposity_manager.nomenclature_key() ]
         data = common.models_to_dto( items )
 
         factory = convert_factory()
@@ -66,7 +66,7 @@ class test_convert(unittest.TestCase):
     # Проверить десериализацию одного элемента
     def test_deserialize_range(self):
         # Подготовка
-        service = start_service()
+        service = start_manager()
         service.start()
         data =  {
                 "name":"Грамм",

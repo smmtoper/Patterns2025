@@ -7,7 +7,7 @@ import json
 """
 Репозиторий данных
 """
-class reposity(abstract_manager):
+class reposity_manager(abstract_manager):
     __data = {}
 
     @property
@@ -71,10 +71,10 @@ class reposity(abstract_manager):
     @staticmethod
     def keys() -> list:
         result = []
-        methods = [method for method in dir(reposity) if
-                    callable(getattr(reposity, method)) and method.endswith('_key')]
+        methods = [method for method in dir(reposity_manager) if
+                    callable(getattr(reposity_manager, method)) and method.endswith('_key')]
         for method in methods:
-            key = getattr(reposity, method)()
+            key = getattr(reposity_manager, method)()
             result.append(key)
 
         return result
@@ -84,7 +84,7 @@ class reposity(abstract_manager):
     Инициализация
     """
     def initalize(self):
-        keys = reposity.keys()
+        keys = reposity_manager.keys()
         for key in keys:
             self.__data[ key ] = []
 
@@ -106,7 +106,7 @@ class reposity(abstract_manager):
         factory = convert_factory() 
         
         # Формируем общий словарь
-        for key in reposity.keys():
+        for key in reposity_manager.keys():
             models = self.data[ key  ]
             dtos = common.models_to_dto( models)
             data = factory.serialize( dtos )

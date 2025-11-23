@@ -1,4 +1,4 @@
-from Src.reposity import reposity
+from Src.reposity_manager import reposity_manager
 from Src.Models.range_model import range_model
 from Src.Models.group_model import group_model
 from Src.Models.nomenclature_model import nomenclature_model
@@ -16,9 +16,9 @@ from Src.Dtos.transaction_dto import transaction_dto
 from Src.Core.abstract_manager import abstract_manager
 from Src.Logics.convert_factory import convert_factory
 
-class start_service(abstract_manager):
+class start_manager(abstract_manager):
     # Репозиторий
-    __repo: reposity = reposity()
+    __repo: reposity_manager = reposity_manager()
 
     # Рецепт по умолчанию
     __default_receipt: receipt_model
@@ -36,7 +36,7 @@ class start_service(abstract_manager):
     # Singletone
     def __new__(cls):
         if not hasattr(cls, 'instance'):
-            cls.instance = super(start_service, cls).__new__(cls)
+            cls.instance = super(start_manager, cls).__new__(cls)
         return cls.instance 
 
 
@@ -77,7 +77,7 @@ class start_service(abstract_manager):
         for range in ranges:
             dto = range_dto().create(range)
             item = range_model.from_dto(dto, self.__cache)
-            self.__save_item_to_reposity( reposity.range_key(), dto, item )
+            self.__save_item_to_reposity( reposity_manager.range_key(), dto, item )
 
         return True
 
@@ -91,7 +91,7 @@ class start_service(abstract_manager):
         for category in  categories:
             dto = category_dto().create(category)    
             item = group_model.from_dto(dto, self.__cache )
-            self.__save_item_to_reposity( reposity.group_key(), dto, item )
+            self.__save_item_to_reposity( reposity_manager.group_key(), dto, item )
 
         return True
     
@@ -105,7 +105,7 @@ class start_service(abstract_manager):
         for storage in storages:
             dto = storage_dto().create(storage)
             item = storage_model.from_dto(dto, self.__cache )
-            self.__save_item_to_reposity( reposity.storage_key(), dto, item )
+            self.__save_item_to_reposity( reposity_manager.storage_key(), dto, item )
 
         return True    
 
@@ -118,7 +118,7 @@ class start_service(abstract_manager):
         for transaction in data:
             dto = transaction_dto().create(transaction)
             item = transaction_model.from_dto(dto, self.__cache )
-            self.__save_item_to_reposity( reposity.transaction_key(), dto, item )
+            self.__save_item_to_reposity( reposity_manager.transaction_key(), dto, item )
 
         return True    
 
@@ -132,7 +132,7 @@ class start_service(abstract_manager):
         for nomenclature in nomenclatures:
             dto = nomenclature_dto().create(nomenclature)
             item = nomenclature_model.from_dto(dto, self.__cache)
-            self.__save_item_to_reposity( reposity.nomenclature_key(), dto, item )
+            self.__save_item_to_reposity( reposity_manager.nomenclature_key(), dto, item )
 
         return True        
 
@@ -180,7 +180,7 @@ class start_service(abstract_manager):
                 self.__default_receipt.composition.append(item)
                 
             # Сохраняем рецепт
-            self.__repo.data[ reposity.receipt_key() ].append(self.__default_receipt)
+            self.__repo.data[ reposity_manager.receipt_key() ].append(self.__default_receipt)
             return True
         except Exception as e:
             self.__error_message = str(e)
