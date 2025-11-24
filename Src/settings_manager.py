@@ -1,5 +1,4 @@
 from Src.Models.settings_model import settings_model
-from Src.Core.validator import argument_exception
 from Src.Core.validator import operation_exception
 from Src.Core.validator import validator
 from Src.Models.company_model import company_model
@@ -43,7 +42,7 @@ class settings_manager(abstract_manager):
                 # Реквизиты оргаизации
                 if "company" in settings.keys():
                     data = settings["company"]
-                    result = self.__convert(data)
+                    result = self.__deserialize(data)
                 
                 # Формат по умолчанию
                 if "default_format" in settings.keys() and result == True:
@@ -63,7 +62,7 @@ class settings_manager(abstract_manager):
             return False
         
     # Обработать полученный словарь    
-    def __convert(self, data: dict) -> bool:
+    def __deserialize(self, data: dict) -> bool:
         validator.validate(data, dict)
 
         fields = common.get_fields(self.__settings.company)

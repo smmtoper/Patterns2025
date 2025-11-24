@@ -46,12 +46,12 @@ class start_manager(abstract_manager):
     # Загрузить стартовые данные из файла
     def load(self) -> bool:
         if self.file_name == "":
-            raise operation_exception("Не найден файл настроек!")
+            raise operation_exception("Не найден файл с данными по умолчанию!")
 
         try:
             with open( self.file_name, 'r') as file_instance:
-                settings = json.load(file_instance)
-                return self.convert(settings)
+                data = json.load(file_instance)
+                return self.deserialize(data)
         except Exception as e:
             self.__error_message = str(e)
             return False
@@ -65,7 +65,7 @@ class start_manager(abstract_manager):
         self.__repo.data[ key ].append(item)
 
     # Загрузить единицы измерений   
-    def __convert_ranges(self, data: dict) -> bool:
+    def __deserialize_ranges(self, data: dict) -> bool:
         validator.validate(data, dict)
         ranges = data['ranges'] if 'ranges' in data else []    
         if len(ranges) == 0:
@@ -79,7 +79,7 @@ class start_manager(abstract_manager):
         return True
 
     # Загрузить группы номенклатуры
-    def __convert_groups(self, data: dict) -> bool:
+    def __deserialize_groups(self, data: dict) -> bool:
         validator.validate(data, dict)
         categories =  data['categories'] if 'categories' in data else []    
         if len(categories) == 0:
@@ -93,7 +93,7 @@ class start_manager(abstract_manager):
         return True
     
     # Загрузить склады
-    def __convert_storages(self, data:dict) -> bool:
+    def __deserialize_storages(self, data:dict) -> bool:
         validator.validate(data, dict)
         storages = data['storages'] if 'storages' in data else []    
         if len(storages) == 0:
@@ -107,7 +107,7 @@ class start_manager(abstract_manager):
         return True    
 
     # Загрузить тестовые транзакции
-    def __convert_transactions(self, data:list) -> bool:
+    def __deserialize_transactions(self, data:list) -> bool:
         validator.validate(data, list)
         if len(data) == 0:
             return False
@@ -120,7 +120,7 @@ class start_manager(abstract_manager):
         return True    
 
     # Загрузить номенклатуру
-    def __convert_nomenclatures(   self, data: dict) -> bool:
+    def __deserialize_nomenclatures(   self, data: dict) -> bool:
         validator.validate(data, dict)      
         nomenclatures = data['nomenclatures'] if 'nomenclatures' in data else []   
         if len(nomenclatures) == 0:
@@ -134,21 +134,21 @@ class start_manager(abstract_manager):
         return True        
 
     # Обработать справочники
-    def __convert_references(self, data:dict) -> bool:
+    def __deserialize_references(self, data:dict) -> bool:
         validator.validate(data, dict)
 
         try:
-            self.__convert_ranges(data)
-            self.__convert_groups(data)
-            self.__convert_nomenclatures(data) 
-            self.__convert_storages(data)       
+            self.__deserialize_ranges(data)
+            self.__deserialize_groups(data)
+            self.__deserialize_nomenclatures(data) 
+            self.__deserialize_storages(data)       
             return True
         except Exception as e:
             self.__error_message = str(e)
             return False
 
     # Загрузить рецепты
-    def __convert_receipts(self, data:list) -> bool:
+    def __deserialize_receipts(self, data:list) -> bool:
         validator.validate(data, list)
 
         if len(data) == 0:
@@ -162,26 +162,26 @@ class start_manager(abstract_manager):
             
 
     # Обработать полученный словарь    
-    def convert(self, data: dict) -> bool:
+    def deserialize(self, data: dict) -> bool:
         validator.validate(data, dict)
         loaded_references = True
-        loaded_receipt = True
+        loaded_receipts = True
         loaded_transactions = True
 
         # Обработать справочники
         if "default_refenences" in data.keys():
                 default_refenences = data["default_refenences"]
-                loaded_references = self.__convert_references(default_refenences)
+                loaded_references = self.__deserialize_references(default_refenences)
 
         # Обработать рецепты
         if "default_receipts" in data.keys():
                 default_receipts = data["default_receipts"]
-                loaded_receipts = self.__convert_receipts(default_receipts)  
+                loaded_receipts = self.__deserialize_receipts(default_receipts)  
 
         # Загрузить транзакции
         if "default_transactions" in data.keys():
                 default_transactions = data["default_transactions"]
-                loaded_transactions = self.__convert_transactions(default_transactions)             
+                loaded_transactions = self.__deserialize_transactions(default_transactions)             
 
         return loaded_references and loaded_receipts and loaded_transactions
 
