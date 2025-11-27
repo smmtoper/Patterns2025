@@ -4,6 +4,7 @@ from Src.reposity_manager import reposity_manager
 from Src.Logics.convert_factory import convert_factory
 from Src.Core.common import common
 from Src.Dtos.range_dto import range_dto
+from Src.Logics.print_service import print_service
 
 # Тесты для проверки конвертации данных (сериализация / десериализация) 
 class test_convert(unittest.TestCase):
@@ -30,6 +31,7 @@ class test_convert(unittest.TestCase):
     # Проверить сериализация списка единиц измерения
     def test_convert_factory_serialize_ranges(self):
         # Подготовка
+        print_service()
         service = start_manager()
         service.start()
         items = reposity_manager().data[  reposity_manager.range_key() ]

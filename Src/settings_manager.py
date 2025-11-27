@@ -85,5 +85,7 @@ class settings_manager(abstract_manager):
         self.__settings = settings_model()
         self.__settings.company = company
 
+        
+
 
 

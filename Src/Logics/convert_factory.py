@@ -5,6 +5,8 @@ from Src.Core.abstract_logic import abstract_logic
 from Src.Core.common import common
 from Src.Core.validator import validator, operation_exception, argument_exception
 from datetime import datetime
+from Src.Core.observe_service import observe_service
+from Src.Core.event_type import event_type
 
 # Подключаем dto
 from Src.Dtos.category_dto import category_dto
@@ -35,7 +37,6 @@ class basic_convertor(abstract_convert):
       return None   
    
 
-
 """
 Конвертация перечисления
 """
@@ -49,8 +50,6 @@ class enum_convertor(abstract_convert):
             self.set_exception(ex)  
 
       return None   
-
-
 
 """
 Конвертация даты
@@ -101,7 +100,6 @@ class convert_factory(abstract_logic):
 
         # Ввиду наследования
         self._maps[  transaction_dto  ] =    reference_convertor 
-    
 
     """
     Выполнить сериализацию модели в данные
@@ -132,7 +130,10 @@ class convert_factory(abstract_logic):
                     result[field] =  dictionary[field]
                 else:
                     result[field] = dictionary       
-          
+
+        # Форпмируем событие о конвертации в Json  
+        observe_service.create_event( event_type.convert_to_json(), result )  
+        
         return result  
     
     """

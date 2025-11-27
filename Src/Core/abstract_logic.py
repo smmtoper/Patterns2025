@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
-from Src.Core.validator import validator
+from abc import ABC
+from Src.Core.validator import validator, operation_exception
+from Src.Core.event_type import event_type
 
 
 """
@@ -36,5 +37,18 @@ class abstract_logic(ABC):
     """
     def set_exception(self, ex: Exception):
         self.__error_text = f"Ошибка! Исключение {ex}"
+
+    """
+    Обработка события
+    """
+    def handle(self,  event: str, params):
+        validator.validate(event, str)
+        events =  event_type.events()
+        if event not in events:
+            raise operation_exception(f"{events} - не является событием!")
+            
+        
+
+
 
 
