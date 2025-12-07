@@ -31,27 +31,6 @@ class reference_service:
             return "storage", self.storages, storage_dto, storage_model
         raise operation_exception("Unsupported reference type")
 
-    def get(self, reference_type: str, unique_code: str):
-        validator.validate(reference_type, str)
-        validator.validate(unique_code, str)
-        _, collection, _, _ = self._type_map(reference_type)
-        for item in collection.data:
-            if getattr(item, "unique_code", None) == unique_code:
-                return item
-        return None
-
-    def get_all(self, reference_type: str):
-        _, collection, _, _ = self._type_map(reference_type)
-        return list(collection.data)
-
-    def find(self, reference_type: str, field_name: str, value):
-        from Src.Dtos.filter_dto import filter_dto
-        f = filter_dto()
-        f.field_name = field_name
-        f.value = value
-        _, collection, _, _ = self._type_map(reference_type)
-        return prototype.filter(collection.data, f)
-
     def add(self, reference_type: str, payload):
         _, collection, dto_cls, model_cls = self._type_map(reference_type)
         if isinstance(payload, dict):
@@ -67,6 +46,7 @@ class reference_service:
                 raise operation_exception("Item with same id already exists")
         collection.data.append(model)
         observe_service.create_event("add", model)
+        observe_service.create_event("log_debug", f"Added {reference_type}: {model}")
         return model
 
     def update(self, reference_type: str, unique_code: str, payload):
@@ -91,6 +71,7 @@ class reference_service:
                 model.unique_code = unique_code
         collection.data[target_index] = model
         observe_service.create_event("update", model)
+        observe_service.create_event("log_debug", f"Updated {reference_type}: {model}")
         return model
 
     def delete(self, reference_type: str, unique_code: str):
@@ -105,24 +86,5 @@ class reference_service:
         observe_service.create_event("before_delete", target)
         collection.data = [x for x in collection.data if getattr(x, "unique_code", None) != unique_code]
         observe_service.create_event("delete", target)
-        return True
-
-    def add_nomenclature(self, item: nomenclature_model):
-        validator.validate(item, nomenclature_model)
-        self.nomenclatures.data.append(item)
-        observe_service.create_event("add", item)
-
-    def update_nomenclature(self, item: nomenclature_model):
-        validator.validate(item, nomenclature_model)
-        for idx, existing in enumerate(self.nomenclatures.data):
-            if existing.unique_code == item.unique_code:
-                self.nomenclatures.data[idx] = item
-                observe_service.create_event("update", item)
-                return item
-        raise operation_exception("Item not found")
-
-    def delete_nomenclature(self, item: nomenclature_model):
-        validator.validate(item, nomenclature_model)
-        self.nomenclatures.data = [x for x in self.nomenclatures.data if x.unique_code != item.unique_code]
-        observe_service.create_event("delete", item)
+        observe_service.create_event("log_debug", f"Deleted {reference_type}: {target}")
         return True
