@@ -1,21 +1,62 @@
-from Src.settings_manager import settings_manager
+import os
+from datetime import datetime
+from Src.Core.observe_service import observe_service
+from Src.Core.log_level import log_level
 
-settings = settings_manager().settings
 
-MIN_LEVEL = settings.min_log_level
-LOG_TO_FILE = settings.log_to_file
+class LogEngine:
+    """
+    Центральный механизм логирования.
+    """
 
-LEVELS = {"DEBUG": 10, "INFO": 20, "ERROR": 30}
+    _instance = None
 
-def log(level, message):
-    if LEVELS[level] >= LEVELS[MIN_LEVEL]:
-        line = f"[{level}] {message}"
-        if LOG_TO_FILE:
-            with open("app.log", "a", encoding="utf-8") as f:
-                f.write(line + "\n")
-        else:
-            print(line)
+    @staticmethod
+    def instance():
+        """Singleton access"""
+        if LogEngine._instance is None:
+            LogEngine._instance = LogEngine()
+        return LogEngine._instance
 
-def debug(msg): log("DEBUG", msg)
-def info(msg): log("INFO", msg)
-def error(msg): log("ERROR", msg)
+    def __init__(self):
+        self.min_level = log_level.INFO      # по умолчанию
+        self.log_file_path = "system.log"   # только если нужно
+        self._initialized = True
+
+    def set_min_level(self, level: int):
+        """Устанавливает минимальный уровень логирования"""
+        self.min_level = level
+
+    def set_file(self, file_path: str):
+        """Изменяет целевой файл логирования"""
+        self.log_file_path = file_path
+
+    def log(self, level: int, event: str, params):
+        """
+        Основной метод логирования.
+        """
+
+        if level < self.min_level:
+            return  # фильтрация по уровню
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        message = {
+            "timestamp": timestamp,
+            "level": log_level.to_text(level),
+            "event": event,
+            "params": params
+        }
+
+        try:
+            observe_service.create_event("log", message)
+        except Exception as ex:
+            self._write_fallback(ex, message)
+
+    def _write_fallback(self, error, message):
+
+        try:
+            with open("fatal_log_engine.log", "a", encoding="utf-8") as f:
+                f.write(f"[FATAL] Logging failed: {error}\nMsg: {message}\n")
+        except:
+            pass   # совсем аварийная ситуация

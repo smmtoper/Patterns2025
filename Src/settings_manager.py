@@ -4,12 +4,13 @@ from Src.Core.validator import validator, operation_exception
 from Src.Core.common import common
 from Src.Core.response_formats import response_formats
 from Src.Core.abstract_manager import abstract_manager
+from Src.Core.observe_service import observe_service
+from Src.Core.log_engine import LogEngine
+
 import json, os
 from datetime import datetime
-from Src.Core.log_engine import log_engine
 
 class settings_manager(abstract_manager):
-
     __settings: settings_model = None
     DATE_FORMAT = "%Y-%m-%d"
 
@@ -20,24 +21,49 @@ class settings_manager(abstract_manager):
 
     def __init__(self):
         self.__set_default()
+        observe_service.add(self)
 
     @property
     def settings(self) -> settings_model:
         return self.__settings
+
+    @property
+    def min_log_level(self):
+        return self.__settings.min_log_level
+
+    @min_log_level.setter
+    def min_log_level(self, value: str):
+        if value not in ("DEBUG", "INFO", "ERROR"):
+            raise ValueError("Недопустимый уровень логирования")
+        old = self.__settings.min_log_level
+        self.__settings.min_log_level = value
+        LogEngine.set_level(value)
+        observe_service.create_event("settings_changed", {"field": "min_log_level", "old": old, "new": value})
+
+    @property
+    def log_to_file(self):
+        return self.__settings.log_to_file
+
+    @log_to_file.setter
+    def log_to_file(self, value: bool):
+        old = self.__settings.log_to_file
+        self.__settings.log_to_file = bool(value)
+        LogEngine.set_output(to_file=bool(value))
+        observe_service.create_event("settings_changed", {"field": "log_to_file", "old": old, "new": value})
 
     def load(self) -> bool:
         if not self.file_name:
             raise operation_exception("Не найден файл настроек!")
 
         if not os.path.exists(self.file_name):
-            log_engine.error(f"Файл настроек '{self.file_name}' не найден")
+            LogEngine.error(f"Файл настроек '{self.file_name}' не найден")
             return False
 
         try:
             with open(self.file_name, 'r', encoding='utf-8') as f:
                 data = json.load(f)
 
-            log_engine.info(f"Настройки загружены из {self.file_name}")
+            LogEngine.info(f"Настройки загружены из {self.file_name}")
 
             self.__apply_company(data)
             self.__apply_default_format(data)
@@ -47,7 +73,7 @@ class settings_manager(abstract_manager):
             return True
 
         except Exception as e:
-            log_engine.error(f"Ошибка загрузки настроек: {e}")
+            LogEngine.error(f"Ошибка загрузки настроек: {e}")
             return False
 
     def __apply_company(self, data: dict):
@@ -85,8 +111,11 @@ class settings_manager(abstract_manager):
         if level not in ("DEBUG", "INFO", "ERROR"):
             level = "INFO"
         self.__settings.min_log_level = level
+        LogEngine.set_level(level)
 
-        self.__settings.log_to_file = bool(data.get("log_to_file", False))
+        to_file = bool(data.get("log_to_file", False))
+        self.__settings.log_to_file = to_file
+        LogEngine.set_output(to_file=to_file)
 
     def __set_default(self):
         company = company_model()
@@ -98,3 +127,19 @@ class settings_manager(abstract_manager):
         self.__settings.block_period = None
         self.__settings.min_log_level = "INFO"
         self.__settings.log_to_file = False
+
+    def save(self):
+        try:
+            data = {
+                "company": {"name": self.settings.company.name, "inn": self.settings.company.inn},
+                "default_format": self.settings.default_response_format,
+                "block_period": self.settings.block_period.strftime(self.DATE_FORMAT) if self.settings.block_period else None,
+                "min_log_level": self.settings.min_log_level,
+                "log_to_file": self.settings.log_to_file
+            }
+            with open(self.file_name, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+            LogEngine.info(f"Настройки сохранены в {self.file_name}")
+            observe_service.create_event("settings_saved", data)
+        except Exception as e:
+            LogEngine.error(f"Ошибка сохранения настроек: {e}")
