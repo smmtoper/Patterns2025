@@ -6,6 +6,10 @@ __pycache__/
 
 idea/
 *.iml
+.idea/
+*.pyc
+*.pyo
+*.log
 
 
 # C extensions
